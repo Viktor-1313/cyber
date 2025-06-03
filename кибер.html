@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CyberTravelRussia</title>
+    
+    <style>
+        /* Базовые стили */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Контейнер для всех экранов */
+        #app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Стили для экранов */
+        .screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            left: 0;
+            top: 0;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Общие стили для контента экранов */
+        .frame-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
+
+        /* Стили для кнопок */
+        .button {
+            position: absolute;
+            border: none;
+            background: linear-gradient(45deg, #00f2ff, #0066ff);
+            color: white;
+            font-size: 24px;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0, 100, 200, 0.4);
+        }
+
+        /* Анимация для кнопок */
+        .button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #00ccff, #0044ff);
+            box-shadow: 0 8px 16px rgba(0, 120, 255, 0.6);
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        /* Стили для кнопки "Назад" */
+        .back-button {
+            position: absolute;
+            top: 80px;
+            left: 740px;
+            width: 44px;
+            height: 44px;
+            background-color: black;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            background-color: white;
+        }
+
+        /* SVG стрелки */
+        .back-icon path {
+            stroke: white;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover .back-icon path {
+            stroke: black;
+        }
+
+        /* Стили для логотипа */
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 32px;
+            color: #00f2ff;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        /* Стили для главного меню */
+        .main-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* Стили для разделов */
+        .section {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .section h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .section p {
+            font-size: 24px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        /* Стили для карты */
+        #map-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .region {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: rgba(0, 255, 255, 0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .region:hover {
+            transform: scale(1.2);
+            background-color: rgba(0, 255, 255, 0.8);
+        }
+
+        /* Стили для аватаров на заставке */
+        .avatar {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            cursor: pointer;
+            animation: float 3s ease-in-out infinite;
+            z-index: 5;
+        }
+
+        /* Анимация для аватаров */
+        @keyframes float {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(20px) translateY(-20px); }
+        }
+
+        /* Стили для профиля пользователя */
+        .profile-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .profile-section {
+            width: 100%;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-section h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        /* Стили для 3D аватара */
+        .avatar-3d {
+            width: 400px;
+            height: 600px;
+            margin: 20px;
+            border: 2px solid #00f2ff;
+            border-radius: 10px;
+        }
+
+        /* Стили для NFT */
+        .nft-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .nft-card {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #00f2ff;
+            transition: all 0.3s ease;
+        }
+
+        .nft-card:hover {
+            transform: scale(1.05);
+            background: #2a2a2a;
+        }
+
+        /* Стили для футера */
+        footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            color: #888;
+        }
+
+        /* Анимация для лозунга */
+        @keyframes waveText {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -60%) scale(1.05); }
+        }
+
+        .slogan {
+            position: absolute;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            color: #00f2ff;
+            text-align: center;
+            max-width: 800px;
+            animation: waveText 3s ease-in-out infinite;
+        }
+
+        /* Стили для хедера */
+        .header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 99;
+        }
+
+        .menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .menu-button {
+            background: transparent;
+            color: #fff;
+            font-size: 20px;
+            padding: 10px 20px;
+            border: 2px solid #00f2ff;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-button:hover {
+            background: #00f2ff;
+            color: #000;
+        }
+
+        /* Стили для активного пункта меню */
+        .menu-button.active {
+            background: #00f2ff;
+            color: #000;
+        }
+
+        /* Стили для региона */
+        .region-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .region-info.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .region-info h3 {
+            margin-top: 0;
+            font-size: 28px;
+        }
+
+        .region-info p {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- === Контейнер для всех экранов === -->
+    <div id="app-container">
+        <!-- === Экран 0: Анимационная заставка с картой === -->
+        <div id="screen0" class="screen active">
+            <div class="frame-wrapper" id="wrapper0">
+            <img src="images/1.png" alt="1" />
+                <!-- === Логотип === -->
+                <div class="logo" onclick="showScreen(1)">CyberTravelRussia</div>
+                
+                <!-- === Лозунг === -->
+                <div class="slogan" style="top: 120px;">
+                    Welcome to Cyber Russia! Добро пожаловать в Кибер Россию!
+                </div>
+                <div class="slogan" style="top: 180px;">
+                    Путешествуй, делай добрые дела и повышай уровень Кармы!
+                </div>
+
+                <!-- === Интерактивная карта === -->
+                <div id="map-container">
+                    <!-- Пример регионов (их можно перемещать по координатам) -->
+                    <div class="region" style="top: 40%; left: 50%; background: #00f2ff;" 
+                         onmouseenter="showRegionInfo('moscow')" 
+                         onmouseleave="hideRegionInfo()" 
+                         onclick="enterRegion('Москва')">
+                        Москва
+                    </div>
+                    
+                    <div class="region" style="top: 30%; left: 30%; background: #00f2ff;" 
+                         onmouseenter="showRegionInfo('saint-petersburg')" 
+                         onmouseleave="hideRegionInfo()" 
+                         onclick="enterRegion('Санкт-Петербург')">
+                        Санкт-Петербург
+                    </div>
+                    
+                    <div class="region" style="top: 50%; left: 70%; background: #00f2ff;"
+                         onmouseenter="showRegionInfo('novosibirsk')" 
+                         onmouseleave="hideRegionInfo()" 
+                         onclick="enterRegion('Новосибирск')">
+                        Новосибирск
+                    </div>
+
+                    <!-- === Информация о регионе === -->
+                    <div id="region-info" class="region-info"></div>
+                </div>
+
+                <!-- === Аватары героев === -->
+                <div class="avatar" style="top: 200px; left: 100px;"></div>
+                <div class="avatar" style="top: 200px; left: 200px;"></div>
+                <div class="avatar" style="top: 200px; left: 300px;"></div>
+            </div>
+        </div>
+
+        <!-- === Экран 1: Главное меню === -->
+        <div id="screen1" class="screen">
+            <div class="frame-wrapper" id="wrapper1">
+             <img src="images/1.png" alt="1" />
+                <!-- === Хедер === -->
+                <div class="header">
+                    <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+                    <div class="menu">
+                        <button class="menu-button active" onclick="showScreen(1)">Главная</button>
+                        <button class="menu-button" onclick="showScreen(2)">Личный кабинет</button>
+                        <button class="menu-button" onclick="showScreen(3)">Карта регионов</button>
+                        <button class="menu-button" onclick="showScreen(4)">Квесты</button>
+                        <button class="menu-button" onclick="showScreen(5)">NFT</button>
+                    </div>
+                </div>
+
+                <!-- === Основной контент === -->
+                <div class="section">
+                    <h1>Добро пожаловать в Кибер Россию!</h1>
+                    <p>
+                        Путешествуй по виртуальной России, выполняй задания, собирай NFT и повышай уровень Кармы!
+                    </p>
+                    
+                    <!-- === Кнопки основного меню === -->
+                    <div style="margin-top: 40px;">
+                        <button class="button" style="margin: 15px;" onclick="showScreen(2)">Перейти в личный кабинет</button>
+                        <button class="button" style="margin: 15px;" onclick="showScreen(3)">Путешествовать по регионам</button>
+                        <button class="button" style="margin: 15px;" onclick="showScreen(4)">Выполнить квесты</button>
+                        <button class="button" style="margin: 15px;" onclick="showScreen(5)">Посмотреть NFT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === Экран 2: Личный кабинет === -->
+        <div id="screen2" class="screen">
+            <div class="frame-wrapper" id="wrapper2">
+            <img src="images/2.png" alt="2" />
+                <!-- === Хедер === -->
+                <div class="header">
+                    <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+                    <div class="menu">
+                        <button class="menu-button" onclick="showScreen(0)">На главную</button>
+                        <button class="menu-button active" onclick="showScreen(2)">Личный кабинет</button>
+                        <button class="menu-button" onclick="showScreen(3)">Карта регионов</button>
+                        <button class="menu-button" onclick="showScreen(4)">Квесты</button>
+                        <button class="menu-button" onclick="showScreen(5)">NFT</button>
+                    </div>
+                </div>
+
+                <!-- === Контент личного кабинета === -->
+                <div class="profile-container">
+                    <!-- === Заголовок === -->
+                    <h1 style="margin-bottom: 30px;">Личный кабинет</h1>
+                    
+                    <!-- === 3D аватар === -->
+                    <div class="profile-section">
+                        <h2>Аватар пользователя</h2>
+                        <div class="avatar-3d" id="user-avatar">
+                            <iframe src="https://studio.readyplayer.me/683c9c580fd7e4abfdbd6640.glb" 
+                                    allow="autoplay; fullscreen; xr-spatial-tracking"
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                        <p style="margin-top: 15px;">
+                            Сгенерируйте свой уникальный аватар с помощью ReadyPlayerMe
+                        </p>
+                        <button class="button" onclick="generateAvatar()">Создать аватар</button>
+                    </div>
+
+                    <!-- === История путешествий === -->
+                    <div class="profile-section">
+                        <h2>Путешествия</h2>
+                        <p>История посещенных туров и выполненные задания</p>
+                        <button class="button" onclick="showScreen(4)">Посмотреть квесты</button>
+                    </div>
+
+                    <!-- === NFT коллекция === -->
+                    <div class="profile-section">
+                        <h2>NFT</h2>
+                        <p>Ваша коллекция NFT и возможность подключить криптокошелек</p>
+                        <button class="button" onclick="showScreen(5)">Посмотреть NFT</button>
+                    </div>
+
+                    <!-- === Активность === -->
+                    <div class="profile-section">
+                        <h2>Активность</h2>
+                        <p>Ваши пройденные квесты и накопленные баллы Karma</p>
+                        <button class="button" onclick="showScreen(4)">Посмотреть активность</button>
+                    </div>
+
+                    <!-- === Кнопки навигации === -->
+                    <div class="profile-section" style="display: flex; gap: 20px;">
+                        <button class="button" onclick="showScreen(1)">На главную</button>
+                        <button class="button" onclick="showScreen(3)">Обмен бонусов</button>
+                        <button class="button" onclick="showScreen(4)">Прокачать аватара</button>
+                        <button class="button" onclick="showScreen(4)">Заработать Karma</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === Экран 3: Карта регионов === -->
+        <div id="screen3" class="screen">
+            <div class="frame-wrapper" id="wrapper3">
+            <img src="images/3.png" alt="3" />
+                <!-- === Хедер === -->
+                <div class="header">
+                    <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+                    <div class="menu">
+                        <button class="menu-button" onclick="showScreen(1)">Главная</button>
+                        <button class="menu-button" onclick="showScreen(2)">Личный кабинет</button>
+                        <button class="menu-button active" onclick="showScreen(3)">Карта регионов</button>
+                        <button class="menu-button" onclick="showScreen(4)">Квесты</button>
+                        <button class="menu-button" onclick="showScreen(5)">NFT</button>
+                    </div>
+                </div>
+
+                <!-- === Контент экрана === -->
+                <div class="section">
+                    <h1>Карта регионов</h1>
+                    <p>
+                        Путешествуйте по виртуальной России, открывайте новые регионы, выполняйте задания и собирайте NFT!
+                    </p>
+                    
+                    <!-- === Кнопки навигации === -->
+                    <div style="margin-top: 40px;">
+                        <button class="button" style="margin: 15px;" onclick="showScreen(2)">Личный кабинет</button>
+                        <button class="button" style="margin: 15px;" onclick="showScreen(4)">Квесты</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === Экран 4: Квесты === -->
+        <div id="screen4" class="screen">
+            <div class="frame-wrapper" id="wrapper4">
+            <img src="images/4.png" alt="4" />
+                <!-- === Хедер === -->
+                <div class="header">
+                    <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+                    <div class="menu">
+                        <button class="menu-button" onclick="showScreen(1)">Главная</button>
+                        <button class="menu-button" onclick="showScreen(2)">Личный кабинет</button>
+                        <button class="menu-button" onclick="showScreen(3)">Карта регионов</button>
+                        <button class="menu-button active" onclick="showScreen(4)">Квесты</button>
+                        <button class="menu-button" onclick="showScreen(5)">NFT</button>
+                    </div>
+                </div>
+
+                <!-- === Контент экрана === -->
+                <div class="section">
+                    <h1>Квесты и задания</h1>
+                    <p>
+                        Выполняйте задания и квесты в разных регионах, чтобы повышать уровень своего аватара и получать NFT-награды!
+                    </p>
+                    
+                    <!-- === Пример квестов === -->
+                    <div class="profile-section">
+                        <h2>Доступные квесты</h2>
+                        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 10px; width: 300px;">
+                                <h3>Квест "Сердце Москвы"</h3>
+                                <p>Выполни задания в Москве и получи уникальный NFT</p>
+                                <button class="button" style="width: 100%; padding: 10px;" onclick="startQuest('moscow')">Начать квест</button>
+                            </div>
+                            
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 10px; width: 300px;">
+                                <h3>Квест "Сибирские просторы"</h3>
+                                <p>Путешествуй по Сибири и открой тайны Урала</p>
+                                <button class="button" style="width: 100%; padding: 10px;" onclick="startQuest('siberia')">Начать квест</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- === Кнопки навигации === -->
+                    <div class="profile-section">
+                        <button class="button" onclick="showScreen(2)">Личный кабинет</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === Экран 5: NFT === -->
+        <div id="screen5" class="screen">
+            <div class="frame-wrapper" id="wrapper5">
+            <img src="images/5.png" alt="5" />
+                <!-- === Хедер === -->
+                <div class="header">
+                    <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+                    <div class="menu">
+                        <button class="menu-button" onclick="showScreen(1)">Главная</button>
+                        <button class="menu-button" onclick="showScreen(2)">Личный кабинет</button>
+                        <button class="menu-button" onclick="showScreen(3)">Карта регионов</button>
+                        <button class="menu-button" onclick="showScreen(4)">Квесты</button>
+                        <button class="menu-button active" onclick="showScreen(5)">NFT</button>
+                    </div>
+                </div>
+
+                <!-- === Контент экрана === -->
+                <div class="section">
+                    <h1>NFT-коллекции</h1>
+                    <p>
+                        Ваша коллекция NFT и возможность подключить криптокошелек
+                    </p>
+                    
+                    <!-- === NFT контейнер === -->
+                    <div class="profile-section">
+                        <h2>Ваши NFT</h2>
+                        <div class="nft-container">
+                            <div class="nft-card">
+                                <h3>Квест "Сердце Москвы"</h3>
+                                <p>Вы получили NFT за выполнение заданий в Москве</p>
+                            </div>
+                            
+                            <div class="nft-card">
+                                <h3>Квест "Сибирские просторы"</h3>
+                                <p>Вы получили уникальный NFT за путешествие по Сибири</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- === Кнопки навигации === -->
+                    <div class="profile-section">
+                        <button class="button" onclick="showScreen(2)">Личный кабинет</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === Кнопка "Назад" === -->
+    <button class="back-button" onclick="showScreen(1)" style="top: 80px; left: 740px;">
+        <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 17L10 12L15 7M10 12H18"></path>
+        </svg>
+    </button>
+
+    <!-- === Скрипты === -->
+    <script>
+        // Функция для переключения экранов
+        function showScreen(screenNumber) {
+            // Скрываем все экраны
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Показываем нужный экран
+            const target = document.getElementById('screen' + screenNumber);
+            if (target) {
+                target.classList.add('active');
+            }
+        }
+
+        // Функция для выбора региона
+        function enterRegion(regionName) {
+            alert('Вы выбрали регион: ' + regionName);
+            showScreen(3); // Перейти к карте регионов
+        }
+
+        // Функция для отображения информации о регионе
+        function showRegionInfo(region) {
+            const regionInfo = document.getElementById('region-info');
+            const info = {
+                moscow: { title: 'Москва', description: 'Столица России, культурный и исторический центр' },
+                'saint-petersburg': { title: 'Санкт-Петербург', description: 'Северная столица, город с богатой историей' },
+                novosibirsk: { title: 'Новосибирск', description: 'Крупнейший научный центр Сибири' }
+            };
+            
+            if (info[region]) {
+                regionInfo.innerHTML = `
+                    <h3>${info[region].title}</h3>
+                    <p>${info[region].description}</p>
+                    <button class="button" onclick="enterRegion('${info[region].title}')">Посетить регион</button>
+                `;
+                regionInfo.classList.add('show');
+            }
+        }
+
+        function hideRegionInfo() {
+            document.getElementById('region-info').classList.remove('show');
+        }
+
+        // Функция для генерации аватара
+        function generateAvatar() {
+            window.open('https://studio.readyplayer.me/',  '_blank');
+        }
+
+        // Функция для начала квеста
+        function startQuest(questName) {
+            alert('Вы начали квест: ' + questName);
+            showScreen(4); // Перейти к квестам
+        }
+    </script>
+</body>
+</html>
