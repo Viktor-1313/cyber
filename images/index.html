@@ -535,106 +535,15 @@
     transform: translate(-50%, -50%) scale(1.05) rotate(-3deg);
     transition: all 0.3s ease;
 }
-
-/* === Адаптация для экранов до 1200px по ширине === */
-@media (max-width: 1200px) {
-    .main-menu {
-        top: 80px;
-        gap: 50px;
-    }
-
-    .main-menu a {
-        font-size: 16px;
-        line-height: 45px;
-        height: 45px;
-    }
-
-    .logo {
-        font-size: 24px;
-        padding: 8px 16px;
-    }
-
-    .button {
-        width: auto;
-        min-width: 120px;
-        padding: 10px 20px;
-        font-size: 16px;
-    }
-
-    .login-container {
-        width: 300px;
-        padding: 15px;
-    }
-
-    .login-input {
-        font-size: 14px;
-        padding: 10px;
-    }
-
-    .stats-panel {
-        left: 90vw;
-        top: 250px;
-        width: 250px;
-    }
-
-    #map {
-        height: 400px;
-        top: 200px;
-    }
-
-    .slogan {
-        font-size: 18px;
-    }
-}
-
-/* === Адаптация для мобильных устройств === */
-@media (max-width: 768px) {
-    .main-menu {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .logo {
-        font-size: 20px;
-        padding: 6px 12px;
-    }
-
-    .button {
-        width: 90vw;
-        margin: 10px auto;
-        display: block;
-        text-align: center;
-    }
-
-    .login-container {
-        width: 90vw;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    .stats-panel {
-        left: 50%;
-        transform: translateX(-50%);
-        top: 70vh;
-    }
-
-    .karma-exchange-container {
-        width: 90vw;
-        flex-wrap: wrap;
-    }
-}
     </style>
 </head>
 <body>
-        <!-- Контейнер с масштабируемым контентом -->
-        <div class="content-scaler">
+
 
    <!-- === Экран 0: Анимационная заставка с картой === -->
 <div id="screen0" class="screen active">
     <div class="frame-wrapper">
         <img src="images/1.png" alt="Фоновое изображение"/>
-
 
         <!-- Логотип -->
         <div class="logo" onclick="showScreen(1)">CyberTravelRussia</div>
@@ -688,8 +597,6 @@
     <div id="screen1" class="screen">
         <div class="frame-wrapper">
             <img src="images/2.png" alt="Фоновое изображение"/>
-
-
 <!-- === Анимированный аватар face_dance.png === -->
 <img id="face-dance" src="images/6.png" alt="Декоративное изображение"
      style="position: absolute;
@@ -766,8 +673,6 @@
 <div id="screen2" class="screen">
     <div class="frame-wrapper">
         <img src="images/3.png" alt="Фоновое изображение"/>
-
-
         <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
 
         <!-- Меню личного кабинета -->
@@ -826,7 +731,7 @@
         <!-- Аватар пользователя в 3D -->
 <iframe 
     id="user-avatar"
-    src="https://models.readyplayer.me/683c9c580fd7e4abfdbd6640.glb"     
+    src="https://models.readyplayer.me/s"     
     width="400" 
     height="500" 
     frameborder="0" 
@@ -857,8 +762,6 @@
     <div id="screen3" class="screen">
         <div class="frame-wrapper">
             <img src="images/4.png" alt="Фоновое изображение"/>
-
-
             <!-- Логотип -->
             <div class="logo" onclick="showScreen(1)">CyberTravelRussia</div>
             <!-- Форма входа -->
@@ -883,7 +786,6 @@
 <div id="screen4" class="screen">
     <div class="frame-wrapper">
         <img src="images/5.png" alt="Фоновое изображение"/>
-
 
         <!-- Логотип -->
         <div class="logo" onclick="showScreen(2)">CyberTravelRussia</div>
@@ -971,8 +873,6 @@
 <div id="screen5" class="screen">
     <div class="frame-wrapper">
         <img src="images/6.png" alt="Фоновое изображение"/>
-
-
         <!-- Логотип -->
         <div class="logo" onclick="showScreen(3)">CyberTravelRussia</div>
 
@@ -1028,8 +928,6 @@
 <div id="screen6" class="screen">
     <div class="frame-wrapper">
         <img src="images/7.png" alt="Фоновое изображение"/>
-
-
         <!-- Логотип -->
         <div class="logo" onclick="showScreen(1)">CyberTravelRussia</div>
 
@@ -1219,29 +1117,6 @@ document.addEventListener('keydown', function(event) {
     <!-- === JavaScript === -->
     <script>
 
-.content-scaler {
-    width: 1920px;
-    height: 1080px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    transform-origin: center;
-    will-change: transform;
-    transition: transform 0.3s ease;
-}
-
-@media (max-width: 1200px) {
-    .content-scaler {
-        transform: translate(-50%, -50%) scale(0.8);
-    }
-}
-
-@media (max-width: 900px) {
-    .content-scaler {
-        transform: translate(-50%, -50%) scale(0.6);
-    }
-}
 
 function showApplicationForm() {
     document.getElementById('tourList').style.display = 'none';
@@ -1425,16 +1300,6 @@ function registerUser() {
 }
     
 
-function resizeContent() {
-    const scaler = document.querySelector('.content-scaler');
-    if (!scaler) return;
-
-    const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-    scaler.style.transform = `translate(-50%, -50%) scale(${scale})`;
-}
-
-window.addEventListener('resize', resizeContent);
-window.onload = resizeContent;
     </script>
 
     <!-- Leaflet -->

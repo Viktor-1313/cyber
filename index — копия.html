@@ -3,7 +3,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=1920"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>CyberTravelRussia</title>
 
     <!-- Leaflet -->
@@ -35,6 +35,43 @@
     color: var(--text-color);
     font-family: 'Segoe UI', sans-serif;
     overflow: hidden;
+}
+
+@media (max-width: 1200px) {
+    .button {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+    .main-menu {
+        gap: 50px;
+        top: 80px;
+    }
+    .logo {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-menu {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    .main-menu a {
+        font-size: 20px;
+        line-height: normal;
+        height: auto;
+        padding: 10px;
+    }
+    .button {
+        width: 90vw;
+        margin-left: 5vw;
+        font-size: 18px;
+    }
+    .login-container {
+        top: 40vh;
+        width: 90vw;
+    }
 }
 
 .screen {
@@ -731,7 +768,7 @@
         <!-- Аватар пользователя в 3D -->
 <iframe 
     id="user-avatar"
-    src="https://models.readyplayer.me/683c9c580fd7e4abfdbd6640.glb"     
+    src="https://models.readyplayer.me/s"     
     width="400" 
     height="500" 
     frameborder="0" 
