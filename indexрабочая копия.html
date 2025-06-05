@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CyberTravelRussia</title>
+    <style>
+        :root {
+            --primary-color: #00f2ff;
+            --secondary-color: #ff6ec7;
+            --bg-color: #0d0d0d;
+            --text-color: white;
+            --btn-hover: #00ccff;
+            --slogan-color: black; /* Темный цвет слогана */
+            --logo-color: black;    /* Темный цвет логотипа */
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        .screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            left: 0;
+            top: 0;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .frame-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* === Логотип с темным цветом и анимацией === */
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 32px;
+            color: var(--logo-color); /* Темный цвет */
+            cursor: pointer;
+            z-index: 100;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* === Слоган с темным цветом и анимацией === */
+        .slogan {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            text-align: center;
+            max-width: 800px;
+            color: var(--slogan-color); /* Темный цвет */
+            animation: floatText 3s ease-in-out infinite;
+        }
+
+        @keyframes floatText {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -60%) scale(1.05);
+                opacity: 0.9;
+            }
+        }
+
+        .button {
+            position: absolute;
+            border: none;
+            background: linear-gradient(45deg, #00f2ff, #0066ff);
+            color: white;
+            font-size: 20px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0, 100, 200, 0.4);
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #00ccff, #0044ff);
+            box-shadow: 0 8px 16px rgba(0, 120, 255, 0.6);
+        }
+
+        .avatar {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 80px;
+            left: 740px;
+            width: 44px;
+            height: 44px;
+            background-color: black;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .back-icon path {
+            stroke: white;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover .back-icon path {
+            stroke: black;
+        }
+
+        .back-button:hover {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+<!-- === Экран 0: Анимационная заставка с картой === -->
+<div id="screen0" class="screen active">
+    <div class="frame-wrapper">
+        <img src="images/1.png" alt="Фоновое изображение"/>
+
+        <!-- Логотип -->
+        <div class="logo" onclick="showScreen(1)">CyberTravelRussia</div>
+
+        <!-- Лозунги с анимацией -->
+        <div class="slogan" style="top: 120px;">
+            Welcome to Cyber Russia! Добро пожаловать в Кибер Россию!
+        </div>
+        <div class="slogan" style="top: 180px;">
+            Путешествуй, делай добрые дела и повышай уровень Кармы!
+        </div>
+
+        <!-- Интерактивная карта -->
+        <div id="map" style="position: absolute; top: 250px; left: 0; width: 100%; height: 500px;"></div>
+
+        <!-- Аватары героев -->
+        <div class="avatar" style="top: 600px; left: 100px;"></div>
+        <div class="avatar" style="top: 600px; left: 200px;"></div>
+        <div class="avatar" style="top: 600px; left: 300px;"></div>
+    </div>
+</div>
+
+<script>
+    function showScreen(screenNumber) {
+        document.querySelectorAll('.screen').forEach((screen, index) => {
+            screen.classList.remove('active');
+        });
+        document.getElementById('screen' + screenNumber).classList.add('active');
+    }
+
+    // Инициализация карты
+    const map = L.map('map').setView([60, 100], 3); // Россия
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',  {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    fetch('russia-regions.geojson')
+        .then(res => res.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: () => ({ color: "#00f2ff", weight: 2, fillOpacity: 0.1 }),
+                onEachFeature: (feature, layer) => {
+                    layer.on('click', () => alert("Вы выбрали: " + feature.properties.name));
+                }
+            }).addTo(map);
+        });
+</script>
+
+</body>
+</html>
+<!-- === Экран 1: Главное меню === -->
+<div id="screen1" class="screen">
+    <div class="frame-wrapper">
+        <img src="images/2.png" alt="Фоновое изображение"/>
+
+        <!-- Логотип -->
+        <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+
+        <!-- Меню -->
+        <button class="button" style="top: 100px; left: 100px;" onclick="showScreen(0)">На главную</button>
+        <button class="button" style="top: 100px; left: 220px;" onclick="showScreen(2)">Личный кабинет</button>
+        <button class="button" style="top: 100px; left: 400px;" onclick="showScreen(3)">Карта регионов</button>
+        <button class="button" style="top: 100px; left: 600px;" onclick="showScreen(4)">Квесты</button>
+        <button class="button" style="top: 100px; left: 750px;" onclick="showScreen(5)">NFT</button>
+
+        <!-- Кнопки навигации -->
+        <button class="button" style="top: 200px; left: 400px;" onclick="showScreen(2)">Личный кабинет</button>
+        <button class="button" style="top: 280px; left: 400px;" onclick="showScreen(3)">Карта регионов</button>
+        <button class="button" style="top: 360px; left: 400px;" onclick="showScreen(4)">Квесты</button>
+        <button class="button" style="top: 440px; left: 400px;" onclick="showScreen(5)">NFT</button>
+    </div>
+</div>
+
+<!-- === Экран 2: Личный кабинет === -->
+<div id="screen2" class="screen">
+    <div class="frame-wrapper">
+        <img src="images/3.png" alt="Фоновое изображение"/>
+
+        <!-- Логотип -->
+        <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+
+        <!-- Меню -->
+        <button class="button" style="top: 100px; left: 100px;" onclick="showScreen(0)">На главную</button>
+        <button class="button" style="top: 100px; left: 220px;" onclick="showScreen(2)">Личный кабинет</button>
+        <button class="button" style="top: 100px; left: 400px;" onclick="showScreen(3)">Карта регионов</button>
+        <button class="button" style="top: 100px; left: 600px;" onclick="showScreen(4)">Квесты</button>
+        <button class="button" style="top: 100px; left: 750px;" onclick="showScreen(5)">NFT</button>
+
+        <!-- Контент -->
+        <iframe class="button" style="position: absolute; top: 150px; left: 300px; width: 400px; height: 600px; border: none;"
+                src="https://studio.readyplayer.me/683c9c580fd7e4abfdbd6640.glb" 
+                allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+
+        <button class="button" style="top: 100px; left: 100px;" onclick="alert('Профиль')">Мой аватар</button>
+        <button class="button" style="top: 180px; left: 100px;" onclick="alert('Karma')">Обмен Karma</button>
+        <button class="button" style="top: 260px; left: 100px;" onclick="alert('Задания')">Заработать Karma</button>
+        <button class="button" style="top: 340px; left: 100px;" onclick="alert('Прокачка')">Прокачать аватара</button>
+    </div>
+</div>
+
+<!-- === Экран 3: Карта регионов === -->
+<div id="screen3" class="screen">
+    <div class="frame-wrapper">
+        <img src="images/4.png" alt="Фоновое изображение"/>
+
+        <!-- Логотип -->
+        <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+
+        <!-- Меню -->
+        <button class="button" style="top: 100px; left: 100px;" onclick="showScreen(0)">На главную</button>
+        <button class="button" style="top: 100px; left: 220px;" onclick="showScreen(2)">Личный кабинет</button>
+        <button class="button" style="top: 100px; left: 400px;" onclick="showScreen(3)">Карта регионов</button>
+        <button class="button" style="top: 100px; left: 600px;" onclick="showScreen(4)">Квесты</button>
+        <button class="button" style="top: 100px; left: 750px;" onclick="showScreen(5)">NFT</button>
+
+        <!-- Регионы -->
+        <button class="button" style="top: 200px; left: 400px;" onclick="alert('Москва')">Москва</button>
+        <button class="button" style="top: 150px; left: 200px;" onclick="alert('Санкт-Петербург')">Санкт-Петербург</button>
+        <button class="button" style="top: 400px; left: 600px;" onclick="alert('Новосибирск')">Новосибирск</button>
+    </div>
+</div>
+
+<!-- === Экран 4: Квесты === -->
+<div id="screen4" class="screen">
+    <div class="frame-wrapper">
+        <img src="images/5.png" alt="Фоновое изображение"/>
+
+        <!-- Логотип -->
+        <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+
+        <!-- Меню -->
+        <button class="button" style="top: 100px; left: 100px;" onclick="showScreen(0)">На главную</button>
+        <button class="button" style="top: 100px; left: 220px;" onclick="showScreen(2)">Личный кабинет</button>
+        <button class="button" style="top: 100px; left: 400px;" onclick="showScreen(3)">Карта регионов</button>
+        <button class="button" style="top: 100px; left: 600px;" onclick="showScreen(4)">Квесты</button>
+        <button class="button" style="top: 100px; left: 750px;" onclick="showScreen(5)">NFT</button>
+
+        <!-- Квесты -->
+        <button class="button" style="top: 200px; left: 400px;" onclick="alert('Квест: Сердце Москвы')">Сердце Москвы</button>
+        <button class="button" style="top: 280px; left: 400px;" onclick="alert('Квест: Сибирские просторы')">Сибирские просторы</button>
+    </div>
+</div>
+
+<!-- === Экран 5: NFT === -->
+<div id="screen5" class="screen">
+    <div class="frame-wrapper">
+        <img src="images/5.png" alt="Фоновое изображение"/>
+
+        <!-- Логотип -->
+        <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+
+        <!-- Меню -->
+        <button class="button" style="top: 100px; left: 100px;" onclick="showScreen(0)">На главную</button>
+        <button class="button" style="top: 100px; left: 220px;" onclick="showScreen(2)">Личный кабинет</button>
+        <button class="button" style="top: 100px; left: 400px;" onclick="showScreen(3)">Карта регионов</button>
+        <button class="button" style="top: 100px; left: 600px;" onclick="showScreen(4)">Квесты</button>
+        <button class="button" style="top: 100px; left: 750px;" onclick="showScreen(5)">NFT</button>
+
+        <!-- NFT кнопки -->
+        <button class="button" style="top: 200px; left: 400px;" onclick="alert('NFT: Золотая медаль')">Золотая медаль</button>
+        <button class="button" style="top: 280px; left: 400px;" onclick="alert('NFT: Памятник')">Памятник</button>
+    </div>
+</div>
+
+<script>
+    function showScreen(screenNumber) {
+        document.querySelectorAll('.screen').forEach((screen, i) => {
+            screen.classList.toggle('active', i === screenNumber);
+        });
+    }
+
+    // Инициализация карты
+    const map = L.map('map').setView([60, 100], 3); // Россия
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',  {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    fetch('russia-regions.geojson')
+        .then(res => res.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: () => ({ color: "#00f2ff", weight: 2, fillOpacity: 0.1 }),
+                onEachFeature: (feature, layer) => {
+                    layer.on('click', () => alert("Вы выбрали: " + feature.properties.name));
+                }
+            }).addTo(map);
+        });
+</script>
+
+</body>
+</html>

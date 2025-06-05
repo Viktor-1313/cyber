@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920" />
+  <title>CyberTravelRussia</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: black;
+      width: 1920px;
+      height: 1080px;
+      font-family: sans-serif;
+      color: white;
+    }
+    .screen {
+      display: none;
+      position: absolute;
+      width: 1920px;
+      height: 1080px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+    }
+    .screen.active {
+      display: block;
+      z-index: 2;
+    }
+    .frame-wrapper {
+      position: absolute;
+      width: 1920px;
+      height: 1080px;
+      left: 0;
+      top: 0;
+    }
+    .frame-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* === Кнопки с анимацией === */
+    .button {
+      position: absolute;
+      border: none;
+      background-color: rgba(0, 150, 255, 0.8);
+      color: white;
+      font-size: 18px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+      text-align: center;
+      font-weight: bold;
+    }
+    .button:hover {
+      transform: scale(1.60);
+      background-color: rgba(0, 100, 200, 0.9);
+      box-shadow: 0 6px 12px rgba(0, 100, 200, 0.4);
+    }
+    .button:active {
+      transform: scale(0.98);
+    }
+
+    /* === Лого и лозунг === */
+    #logo {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 32px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      animation: floatTitle 2s ease-in-out infinite;
+      cursor: pointer;
+    }
+    @keyframes floatTitle {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, -10px); }
+    }
+
+    #slogan {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+      color: #ccc;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    #call-to-action {
+      position: absolute;
+      top: 130px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 20px;
+      color: #eee;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Аватары героев (анимация движения) */
+    #hero1, #hero2, #hero3 {
+      position: absolute;
+      width: 100px;
+      height: auto;
+      animation: floatHero 3s ease-in-out infinite;
+    }
+    #hero1 {
+      top: 300px;
+      left: 200px;
+    }
+    #hero2 {
+      top: 500px;
+      left: 1600px;
+    }
+    #hero3 {
+      top: 700px;
+      left: 900px;
+    }
+    @keyframes floatHero {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* === Картинка региона === */
+    .region-button {
+      position: absolute;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.8);
+      color: black;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .region-button:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: scale(1.2);
+    }
+
+    /* === NFT и аватар в профиле === */
+    #avatar-iframe {
+      position: absolute;
+      top: 200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      height: 500px;
+      border: none;
+      background: transparent;
+    }
+
+    /* === Облако (фоновая анимация) === */
+    #cloud {
+      position: absolute;
+      top: 10%;
+      left: 0;
+      width: 100px;
+      height: 60px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: moveClouds 10s linear infinite;
+    }
+    @keyframes moveClouds {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(100% - 100px)); }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Фоновое облако -->
+  <div id="cloud"></div>
+
+  <!-- Экран 1: Анимационная заставка -->
+  <div id="screen1" class="screen active">
+    <div class="frame-wrapper"><img src="images/screen1.png" alt=""></div>
+    <div id="logo" onclick="navigateTo('mainMenu')">CyberTravelRussia</div>
+    <div id="slogan">Welcome to Cyber Russia! Добро пожаловать в Кибер Россию!</div>
+    <div id="call-to-action">Путешествуй, делай добрые дела и повышай уровень Кармы!</div>
+    <img id="hero1" src="images/hero1.png" alt="">
+    <img id="hero2" src="images/hero2.png" alt="">
+    <img id="hero3" src="images/hero3.png" alt="">
+    <button class="region-button" style="top: 300px; left: 800px;" onclick="navigateTo('moscow')">Москва</button>
+    <button class="region-button" style="top: 500px; left: 1000px;" onclick="navigateTo('ural')">Урал</button>
+    <button class="region-button" style="top: 700px; left: 1200px;" onclick="navigateTo('baikal')">Байкал</button>
+  </div>
+
+  <!-- Экран 2: Главное меню -->
+  <div id="mainMenu" class="screen">
+    <div class="frame-wrapper"><img src="images/screen2.png" alt=""></div>
+    <div id="logo" onclick="navigateTo('screen1')">CyberTravelRussia</div>
+    <nav style="position: absolute; top: 200px; left: 50%; transform: translateX(-50%);">
+      <button class="button" style="left: 0px;" onclick="navigateTo('profile')">Личный кабинет</button>
+      <button class="button" style="left: 200px;" onclick="navigateTo('regions')">Регионы</button>
+      <button class="button" style="left: 400px;" onclick="navigateTo('tours')">Туры</button>
+      <button class="button" style="left: 600px;" onclick="navigateTo('nft')">NFT</button>
+    </nav>
+    <button class="button" style="top: 400px; left: 800px;" onclick="navigateTo('booking')">Забронировать тур</button>
+    <button class="button" style="top: 500px; left: 800px;" onclick="navigateTo('login')">Войти / Зарегистрироваться</button>
+  </div>
+
+  <!-- Экран 3: Личный кабинет -->
+  <div id="profile" class="screen">
+    <div class="frame-wrapper"><img src="images/screen3.png" alt=""></div>
+    <div id="logo" onclick="navigateTo('mainMenu')">CyberTravelRussia</div>
+    <iframe id="avatar-iframe" src="https://models.readyplayer.me/683c9c580fd7e4abfdbd6640.glb"></iframe> 
+    <button class="button" style="top: 800px; left: 500px;" onclick="navigateTo('karmaExchange')">Обмен бонусов Karma</button>
+    <button class="button" style="top: 800px; left: 800px;" onclick="navigateTo('upgradeAvatar')">Прокачать аватара</button>
+    <button class="button" style="top: 800px; left: 1100px;" onclick="navigateTo('earnKarma')">Заработать Karma</button>
+  </div>
+
+  <!-- Экран 4: Регионы -->
+  <div id="regions" class="screen">
+    <div class="frame-wrapper"><img src="images/screen4.png" alt=""></div>
+    <div id="logo" onclick="navigateTo('mainMenu')">CyberTravelRussia</div>
+    <p style="position: absolute; top: 200px; left: 50%; transform: translateX(-50%); font-size: 24px;">Выберите регион для путешествия:</p>
+    <button class="region-button" style="top: 300px; left: 600px;" onclick="navigateTo('moscow')">Москва</button>
+    <button class="region-button" style="top: 400px; left: 600px;" onclick="navigateTo('ural')">Урал</button>
+    <button class="region-button" style="top: 500px; left: 600px;" onclick="navigateTo('baikal')">Байкал</button>
+  </div>
+
+  <!-- Экран 5: Бронирование туров -->
+  <div id="booking" class="screen">
+    <div class="frame-wrapper"><img src="images/screen5.png" alt=""></div>
+    <div id="logo" onclick="navigateTo('mainMenu')">CyberTravelRussia</div>
+    <h2 style="position: absolute; top: 200px; left: 50%; transform: translateX(-50%);">Забронировать тур</h2>
+    <form style="position: absolute; top: 300px; left: 50%; transform: translateX(-50%);">
+      <label>Город:<br><input type="text" placeholder="Например: Москва"></label><br><br>
+      <label>Дата начала:<br><input type="date"></label><br><br>
+      <label>Количество человек:<br><input type="number" min="1"></label><br><br>
+      <button class="button" type="submit">Подтвердить</button>
+    </form>
+  </div>
+
+  <script>
+    function navigateTo(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1308 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920"/>
+    <title>CyberTravelRussia</title>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/> 
+
+    <style>
+        /* === Цветовые переменные === */
+        :root {
+            --logo-color: #000;
+            --logo-bg-color: #fff;
+            --logo-border-color: #000;
+            --logo-hover-color: #fff;
+            --logo-hover-bg-color: #000;
+            --logo-hover-border-color: #fff;
+
+            --primary-color: #00f2ff;
+            --secondary-color: #ff6ec7;
+            --bg-color: #0d0d0d;
+            --text-color: white;
+            --btn-hover: #00ccff;
+            --slogan-color: black;
+            --logo-color: black;
+        }
+
+        body {
+            body {
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
+}
+
+.screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: none;
+    left: 0;
+    top: 0;
+}
+
+.frame-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: visible; /* ВАЖНО: overflow должен быть visible для подменю */
+}
+
+
+
+
+
+/* Адаптивность для разных размеров экранов */
+@media (max-width: 1200px) {
+    .frame-wrapper {
+        width: 100%;
+        height: auto;
+    }
+    .button {
+        font-size: 16px;
+        padding: 10px 15px;
+    }
+    .logo {
+        font-size: 24px;
+    }
+}
+
+ .screen.active {
+            display: block;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .button {
+            position: absolute;
+            border: none;
+            background: linear-gradient(45deg, #00f2ff, #0066ff);
+            color: white;
+            font-size: 20px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0, 100, 200, 0.4);
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #00ccff, #0044ff);
+            box-shadow: 0 8px 16px rgba(0, 120, 255, 0.6);
+        }
+
+        .logo {
+            position: absolute;
+            width: 200px; /* Ширина логотипа */
+            height: 250px; /* Сохраняет пропорции */
+            top: 20px;
+            left: 20px;
+            font-size: 28px;
+            font-weight: auto;
+            color: var(--logo-color);
+            background-color: var(--logo-bg-color);
+            padding: 10px 20px;
+            border: 2px solid var(--logo-border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 100;
+            animation: pulse 2s infinite;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .logo:hover {
+            color: var(--logo-hover-color);
+            background-color: var(--logo-hover-bg-color);
+            border-color: var(--logo-hover-border-color);
+            transform: scale(1.05);
+        }
+
+/* === Основное меню === */
+.main-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 100px; /* Расположение меню по вертикали */
+  left: 55%; /* Центрируем по горизонтали */
+  transform: translateX(-50%);
+  display: flex;
+  gap: 100px;
+}
+
+/* === Стиль пунктов меню === */
+.main-menu li {
+  position: relative; /* Для позиционирования подменю */
+  width: 300px;       /* Ширина каждой кнопки */
+  height: 60px;       /* Высота каждой кнопки */
+}
+
+.main-menu a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #00f2ff, #0066ff);
+  color: white;
+  text-align: center;
+  line-height: 60px; /* Вертикальное центрирование текста */
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: bold;
+  box-shadow: 0 6px 12px rgba(0, 100, 200, 0.4);
+  transition: all 0.3s ease;
+}
+
+.main-menu a:hover {
+  background: linear-gradient(45deg, #00ccff, #0044ff);
+  transform: scale(1.05);
+}
+
+
+/* === Подменю === */
+.submenu {
+  position: absolute;
+  top: 60px; /* Отступ от основной кнопки */
+  left: 0;
+  display: flex; /* Оставляем всегда видимым, но скрытым */
+  flex-direction: column;
+  gap: 10px;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 100;
+  opacity: 0; /* Скрыто по умолчанию */
+  transform: translateY(-10px); /* Немного выше экрана */
+  transition: opacity 0.9s ease, transform 0.9s ease; /* Плавный переход */
+}
+
+/* Когда подменю активно */
+.main-menu li:hover .submenu {
+  opacity: 1; /* Показываем */
+  transform: translateY(0); /* Возвращаем на место */
+}
+
+.submenu li {
+  width: 280px; /* Такой же размер, как у основных кнопок */
+}
+
+.submenu a {
+  display: block;
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  background-color: #00f2ff;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.submenu a:hover {
+  background-color: #00ccff;
+}
+
+/* === Анимация появления подменю === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+    .submenu a:hover {
+      background-color: #00ccff;
+    }
+
+    /* === Анимация подменю при наведении === */
+    .main-menu li:hover .submenu {
+      display: block; /* Показать подменю при наведении */
+    }
+
+        .submenu button {
+            width: auto;
+            min-width: 150px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+
+   /* === Слоган с темным цветом и анимацией === */
+        .slogan {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            text-align: center;
+            max-width: 800px;
+            color: var(--slogan-color); /* Темный цвет */
+            animation: floatText 3s ease-in-out infinite;
+        }
+
+/* === Стили для аватаров на заставке === */
+.avatar {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border-radius: 50%;
+    border: 2px solid var(--primary-color);
+    cursor: pointer;
+
+    /* Анимация движения */
+    animation: float 6s ease-in-out infinite, hoverEffect 3s ease-in-out infinite alternate;
+
+    z-index: 5;
+    transition: transform 3s ease, box-shadow 3s ease;
+}
+
+/* === Анимация "плавания" === */
+@keyframes float {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    50% { transform: translateX(20px) translateY(-20px); }
+}
+
+/* === Анимация при наведении === */
+@keyframes hoverEffect {
+    from {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(0, 242, 255, 0.4);
+    }
+    to {
+        transform: scale(1.2);
+        box-shadow: 0 0 20px rgba(0, 242, 255, 0.8);
+    }
+}
+
+/* === Эффект при наведении === */
+.avatar:hover {
+    animation: float 3s ease-in-out infinite, hoverEffect 0.6s ease-in-out infinite alternate;
+    transform: scale(1.2);
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.8);
+}
+
+        @keyframes floatText {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -60%) scale(1.05);
+                opacity: 0.9;
+            }
+        }
+.profile-container {
+    position: absolute;
+    top: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 1600px;
+}
+
+.avatar-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar-frame iframe {
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+}
+
+.profile-info {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 400px;
+    margin-bottom: 20px;
+}
+
+.stats, .equipment, .travel-history, .nft-section, .activity-section {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.nft-grid {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.nft-grid img {
+    width: 100px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.4);
+}
+
+.login-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+}
+
+.login-input {
+    width: 90%;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    outline: none;
+}
+
+ body { margin: 0; }
+    #map {
+      position: absolute;
+      top: 250px;
+      left: 0;
+      width: 100%;
+      height: 500px;
+    }
+
+
+.stats-panel {
+    position: absolute;
+    top: 300px;
+    left: 1200px;
+    width: 300px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+    font-size: 20px;
+    z-index: 10;
+}
+
+.stats-panel h3 {
+    margin-top: 0;
+    text-align: center;
+    color: #00f2ff; /* Голубой заголовок */
+}
+
+.stats-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.stats-panel li {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-label {
+    color: #00f2ff; /* Статичные метки — синий цвет */
+    font-weight: bold;
+}
+
+.stat-value {
+    color: #00f2ff; /* Значения — голубой цвет */
+    font-weight: normal;
+}
+
+
+ .karma-exchange-container {
+            position: absolute;
+            top: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            width: 1600px;
+        }
+
+        .karma-card {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 12px;
+            width: 300px;
+            height: 150px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            color: white;
+        }
+
+        .karma-card:hover {
+            transform: scale(1.05);
+            background-color: rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.6);
+            color: black;
+        }
+
+        .karma-card h3,
+        .karma-card p,
+        .karma-card .cost {
+            transition: color 0.3s ease;
+        }
+
+        .karma-card:hover h3,
+        .karma-card:hover p,
+        .karma-card:hover .cost {
+            color: black;
+        }
+
+        .karma-balance {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            font-size: 16px;
+            text-align: center;
+            z-index: 1000;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        #karma-count {
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .karma-animate {
+            animation: pop 0.3s ease-in-out;
+        }
+
+        @keyframes pop {
+            0%   { transform: scale(1); opacity: 1; }
+            50%  { transform: scale(1.2); color: #00ffea; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+.login-container {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* === Анимация движения "танцующего лица" === */
+@keyframes floatDance {
+    0%   { transform: translate(-50%, -50%) rotate(0deg); }
+    25%  { transform: translate(-30%, -70%) rotate(-5deg); }
+    50%  { transform: translate(-50%, -90%) rotate(5deg); }
+    75%  { transform: translate(-70%, -70%) rotate(-5deg); }
+    100% { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+/* === Лёгкая тень и плавность при наведении === */
+#face-dance:hover {
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.8);
+    transform: translate(-50%, -50%) scale(1.05) rotate(-3deg);
+    transition: all 0.3s ease;
+}
+    </style>
+</head>
+<body>
+
+
+   <!-- === Экран 0: Анимационная заставка с картой === -->
+<div id="screen0" class="screen active">
+    <div class="frame-wrapper">
+        <img src="images/1.png" alt="Фоновое изображение"/>
+
+        <!-- Логотип -->
+        <div class="logo" onclick="showScreen(1)">CyberTravelRussia</div>
+
+        <!-- Лозунги с анимацией -->
+        <div class="slogan" style="top: 120px;">
+            Welcome to Cyber Russia! Добро пожаловать в Кибер Россию!
+        </div>
+        <div class="slogan" style="top: 900px;">
+            Путешествуй, делай добрые дела и повышай уровень Кармы!
+        </div>
+
+        <!-- Интерактивная карта -->
+        <div id="map" style="position: absolute; top: 250px; left: 0; width: 100%; height: 500px;"></div>
+
+        <!-- Аватары героев -->
+        <img src="images/avatar1.png" class="avatar" style="top: 900px; left: 100px;" />
+        <div class="avatar" style="top: 900px; left: 200px;"></div>
+        <div class="avatar" style="top: 900px; left: 300px;"></div>
+
+        <!-- Новое: анимированное лицо (по центру) -->
+        <img id="face" src="images/face.png" alt="Лицо"
+             style="position: absolute; 
+             width: 400px;
+             height: 400px;
+             cursor: pointer;"
+             onclick="handleFaceClick()">
+
+
+
+    </div>
+</div>
+
+
+<style>
+    /* === Анимация лица === */
+    #face {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+        50% { transform: translate(-50%, -50%) translateY(-10px); }
+    }
+</style>
+
+    <!-- === Экран 1: Главное меню === -->
+    <div id="screen1" class="screen">
+        <div class="frame-wrapper">
+            <img src="images/2.png" alt="Фоновое изображение"/>
+<!-- === Анимированный аватар face_dance.png === -->
+<img id="face-dance" src="images/6.png" alt="Декоративное изображение"
+     style="position: absolute;
+            width: 1350px;
+            height: auto;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            animation: floatDance 5s ease-in-out infinite;">
+
+            <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+            <!-- Главное меню -->
+            <nav>
+                <ul class="main-menu">
+                    <li>
+                        <a href="#" class="dropdown-toggle">О нас (About)</a>
+                        <ul class="submenu">
+                            <li><a href="#">История</a></li>
+                            <li><a href="#">Наша миссия</a></li>
+                            <li><a href="#">Ценности</a></li>
+                            <li><a href="#">Партнеры</a></li>
+                            <li><a href="#">Контакты</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Услуги (Services)</a>
+                        <ul class="submenu">
+                            <li><a href="#">Туры в регионы</a></li>
+                            <li><a href="#">Бронирование</a></li>
+                            <li><a href="#">Экскурсии</a></li>
+                            <li><a href="#">Мероприятия</a></li>
+                            <li><a href="#">Фотосессии</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Регионы России</a>
+                        <ul class="submenu">
+                            <li><a href="#">Описание региона</a></li>
+                            <li><a href="#">Фото мест</a></li>
+                            <li><a href="#">Видео мест</a></li>
+                            <li><a href="#">Народы</a></li>
+                            <li><a href="#">Хранители традиций</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Активности</a>
+                        <ul class="submenu">
+                            <li><a href="#">Квесты героев</a></li>
+                            <li><a href="#">Обучение</a></li>
+                            <li><a href="#">Физкультура</a></li>
+                            <li><a href="#">Зов добра</a></li>
+                            <li><a href="#">NFT маркет</a></li>
+                            <li><a href="#">Этнофиджитал</a></li>
+                            <li><a href="#">Сообщества</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- Другие элементы главного меню -->
+            <button class="button" 
+              style="top: 700px; 
+              left: 80px;
+              width: 170px;
+              height: 200px;
+            " onclick="showScreen(3)">Вход/Регистрация</button>
+            <button class="button" 
+              style="top: 1100px; 
+              left: 1200px;
+              width: 380px;
+              height: 80px;
+            " onclick="showScreen(6)">Забронировать тур</button>
+        </div>
+    </div>
+
+<!-- === Экран 2: Личный кабинет === -->
+<div id="screen2" class="screen">
+    <div class="frame-wrapper">
+        <img src="images/3.png" alt="Фоновое изображение"/>
+        <div class="logo" onclick="showScreen(0)">CyberTravelRussia</div>
+
+        <!-- Меню личного кабинета -->
+        <nav>
+            <ul class="main-menu">
+                <li>
+                    <a href="#" class="dropdown-toggle">Аватар пользователя</a>
+                    <ul class="submenu">
+                        <li><a href="#">Мой аватар</a></li>
+                        <li><a href="#">Изменить внешность</a></li>
+                        <li><a href="#">Снаряжение</a></li>
+                        <li><a href="#">Друзья</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="dropdown-toggle">Путешествия</a>
+                    <ul class="submenu">
+                        <li><a href="#">История поездок</a></li>
+                        <li><a href="#">Карта мест</a></li>
+                        <li><a href="#">Выполненные квесты</a></li>
+                        <li><a href="#">Избранные места</a></li>
+                        <li><a href="#">Скидки за активность</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="dropdown-toggle">NFT пользователя</a>
+                    <ul class="submenu">
+                        <li><a href="#">Мои NFT</a></li>
+                        <li><a href="#">Награды</a></li>
+                        <li><a href="#">Артефакты</a></li>
+                        <li><a href="#">Коллекции</a></li>
+                        <li><a href="#">Подключить кошелёк</a></li>
+                        <li><a href="#">NFT маркетплейс</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="dropdown-toggle">Активности</a>
+                    <ul class="submenu">
+                        <li><a href="#">Текущие задания</a></li>
+                        <li><a href="#">Завершённые квесты</a></li>
+                        <li><a href="#">Статистика</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Кнопки навигации -->
+<button class="button" style="top: 500px; left: 100px; width: 250px; height: 160px;" onclick="showScreen(1)">На главную</button>
+
+<button class="button" style="top: 700px; left: 100px; width: 250px; height: 250px;" onclick="showScreen(4)">Обмен бонусов Karma</button>
+
+<button class="button" style="top: 500px; left: 1950px; width: 300px; height: 60px;" onclick="navigateTo('upgrade-avatar')">Прокачать аватара</button>
+
+<button class="button" style="top: 600px; left: 1950px; width: 300px; height: 60px;" onclick="navigateTo('earn-karma')">Заработать Karma</button>
+
+        <!-- Аватар пользователя в 3D -->
+<iframe 
+    id="user-avatar"
+    src="https://models.readyplayer.me/683c9c580fd7e4abfdbd6640.glb"     
+    width="400" 
+    height="500" 
+    frameborder="0" 
+    allowfullscreen
+    style="position: absolute; top: 300px; left: 760px;">
+</iframe>
+
+<!-- Опциональная кнопка изменения аватара -->
+<button class="button-wide" style="top: 820px; left: 900px;" onclick="changeAvatar()">Изменить аватар</button>
+
+<!-- Панель характеристик -->
+<div class="stats-panel">
+    <h3>Статистика</h3>
+    <ul>
+        <li><span class="stat-label">Имя:</span> <span class="stat-value">Василий Иванов</span></li>
+        <li><span class="stat-label">Сила:</span> <span class="stat-value">75%</span></li>
+        <li><span class="stat-label">Здоровье:</span> <span class="stat-value">80%</span></li>
+        <li><span class="stat-label">Мудрость:</span> <span class="stat-value">65%</span></li>
+        <li><span class="stat-label">Добродетель:</span> <span class="stat-value">70%</span></li>
+    </ul>
+</div>
+    </div>
+</div>
+
+
+
+    <!-- === Экран 3: Вход / Регистрация === -->
+    <div id="screen3" class="screen">
+        <div class="frame-wrapper">
+            <img src="images/4.png" alt="Фоновое изображение"/>
+            <!-- Логотип -->
+            <div class="logo" onclick="showScreen(1)">CyberTravelRussia</div>
+            <!-- Форма входа -->
+            <div class="login-container">
+                <h2 style="color: white; text-align: center;">Вход / Регистрация</h2>
+                <!-- Номер телефона -->
+                <input type="tel" id="phone" class="login-input" placeholder="Введите номер телефона" maxlength="11">
+                <!-- Отправить код -->
+                <button class="button" style="top: 280px; left: 90px;" onclick="sendCode()">Отправить код по SMS</button>
+                <!-- Код из SMS -->
+                <input type="text" id="code" class="login-input" placeholder="Код из SMS" maxlength="4" disabled oninput="checkCodeInput()">
+                <!-- Кнопка "Войти" (скрыта до ввода кода) -->
+                <button id="loginButton" class="button" style="top: 380px; left: 170px; display: none;" onclick="loginUser()">Войти</button>
+                <!-- Ссылка на регистрацию -->
+                <div style="position: absolute; top: 430px; left: 155px; font-size: 30px; color: #00f2ff; cursor: pointer;" onclick="showScreen(5)">Регистрация</div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- === Экран 4: Обмен бонусов Karma === -->
+<div id="screen4" class="screen">
+    <div class="frame-wrapper">
+        <img src="images/5.png" alt="Фоновое изображение"/>
+
+        <!-- Логотип -->
+        <div class="logo" onclick="showScreen(2)">CyberTravelRussia</div>
+
+        <!-- Заголовок раздела -->
+        <h2 style="position: absolute; top: 80px; left: 50%; transform: translateX(-50%); color: white; font-size: 36px;">
+            Обмен бонусов Karma
+        </h2>
+
+<!-- === Контейнер с балансом === -->
+<div class="karma-balance">
+    Баланс бонусов Karma: <span id="karma-count">500</span> K
+</div>
+
+<!-- === Карточки обмена === -->
+<div class="karma-exchange-container">
+    <div class="karma-card" onclick="redeemOffer('Скидка 10%', 50)">
+        <h3>Скидка 10%</h3>
+        <p>На все туры по России</p>
+        <p class="cost">Стоимость: 50 Karma</p>
+    </div>
+
+    <div class="karma-card" onclick="redeemOffer('Скидка 20%', 100)">
+        <h3>Скидка 20%</h3>
+        <p>На проживание в отелях</p>
+        <p class="cost">Стоимость: 100 Karma</p>
+    </div>
+
+    <div class="karma-card" onclick="redeemOffer('Подарочный сертификат', 150)">
+        <h3>Подарочный сертификат</h3>
+        <p>На 1000 рублей</p>
+        <p class="cost">Стоимость: 150 Karma</p>
+    </div>
+
+    <div class="karma-card" onclick="redeemOffer('Бесплатная экскурсия', 200)">
+        <h3>Бесплатная экскурсия</h3>
+        <p>По музею или историческому месту</p>
+        <p class="cost">Стоимость: 200 Karma</p>
+    </div>
+</div>
+
+<!-- === Скрипт с логикой === -->
+<script>
+    // Загружаем баланс из localStorage, если он есть, иначе устанавливаем 500
+    let karmaBalance = parseInt(localStorage.getItem('karmaBalance')) || 500;
+
+    function updateKarmaDisplay() {
+        const balanceElement = document.getElementById('karma-count');
+        balanceElement.textContent = karmaBalance;
+
+        // Сохраняем текущий баланс в localStorage
+        localStorage.setItem('karmaBalance', karmaBalance);
+
+        // Добавляем класс анимации
+        balanceElement.classList.add('karma-animate');
+
+        // Удаляем класс после завершения анимации
+        setTimeout(() => {
+            balanceElement.classList.remove('karma-animate');
+        }, 300);
+    }
+
+    function redeemOffer(title, cost) {
+        if (karmaBalance >= cost) {
+            karmaBalance -= cost;
+            updateKarmaDisplay();
+            alert(`Вы успешно обменяли ${cost} Karma на "${title}"`);
+        } else {
+            alert(`Недостаточно бонусов Karma для "${title}". Требуется: ${cost}`);
+        }
+    }
+
+    // Инициализация отображения баланса при загрузке страницы
+    updateKarmaDisplay();
+</script>
+
+
+
+        <!-- Кнопка "Назад" -->
+        <button class="button" style="top: 300px; left: 100px;" onclick="showScreen(2)">Назад</button>
+    </div>
+</div>
+
+<!-- === Экран 5: Регистрация === -->
+<div id="screen5" class="screen">
+    <div class="frame-wrapper">
+        <img src="images/6.png" alt="Фоновое изображение"/>
+        <!-- Логотип -->
+        <div class="logo" onclick="showScreen(3)">CyberTravelRussia</div>
+
+        <!-- Контейнер формы регистрации по центру -->
+        <div class="login-container centered">
+            <h2 style="color: white; text-align: center;">Регистрация</h2>
+
+            <!-- Имя -->
+            <input type="text" id="regName" class="login-input" placeholder="Имя" />
+
+            <!-- Email -->
+            <input type="email" id="regEmail" class="login-input" placeholder="Email" />
+
+            <!-- Телефон -->
+            <input type="tel" id="regPhone" class="login-input" placeholder="Телефон (10 цифр)" maxlength="10" />
+
+            <!-- Пароль -->
+            <input type="password" id="regPassword" class="login-input" placeholder="Придумайте пароль" />
+
+            <!-- Подтверждение пароля -->
+            <input type="password" id="confirmPassword" class="login-input" placeholder="Подтвердите пароль" />
+
+            <!-- Чекбокс соглашения -->
+            <label style="color: #ccc; font-size: 14px; margin-top: 10px;">
+                <input type="checkbox" id="agreeTerms" />
+                Я принимаю условия пользовательского соглашения
+            </label>
+
+           <!-- Кнопка регистрации -->
+<button 
+    class="button" 
+    style="
+        margin-top: 30px;
+        display: block;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        left: 0px; /* Сдвигает кнопку на 100px влево */
+    " 
+    onclick="registerUser()">
+    Зарегистрироваться
+</button>
+            <!-- Ссылка на вход -->
+            <div style="margin-top: 20px; font-size: 16px; color: #00f2ff; cursor: pointer; text-align: center;" onclick="showLogin()">
+                Уже есть аккаунт? Войти
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- === Экран 6: Бронирование туров === -->
+<div id="screen6" class="screen">
+    <div class="frame-wrapper">
+        <img src="images/7.png" alt="Фоновое изображение"/>
+        <!-- Логотип -->
+        <div class="logo" onclick="showScreen(1)">CyberTravelRussia</div>
+
+        <!-- Заголовок раздела -->
+        <h2 style="position: absolute; top: 80px; left: 50%; transform: translateX(-50%); color: white; font-size: 36px;">
+            Бронирование туров
+        </h2>
+
+        <!-- Поле поиска и фильтры -->
+        <div style="position: absolute; top: 150px; left: 50%; transform: translateX(-50%); width: 1200px; background-color: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 12px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between;">
+                <!-- Поиск по названию -->
+                <input type="text" placeholder="Поиск по названию..." style="width: 300px; padding: 10px; border-radius: 8px; border: none; font-size: 16px;" />
+
+                <!-- Фильтр: локация -->
+                <select style="width: 300px; padding: 10px; border-radius: 8px; border: none; font-size: 16px;">
+                    <option value="">Любая локация</option>
+                    <option value="moscow">Москва</option>
+                    <option value="spb">Санкт-Петербург</option>
+                    <option value="ural">Урал</option>
+                    <option value="siberia">Сибирь</option>
+                </select>
+
+                <!-- Фильтр: длительность -->
+                <select style="width: 300px; padding: 10px; border-radius: 8px; border: none; font-size: 16px;">
+                    <option value="">Любая длительность</option>
+                    <option value="short">До 3 дней</option>
+                    <option value="medium">3–7 дней</option>
+                    <option value="long">Больше недели</option>
+                </select>
+
+                <!-- Фильтр: стоимость -->
+                <select style="width: 300px; padding: 10px; border-radius: 8px; border: none; font-size: 16px;">
+                    <option value="">Любая стоимость</option>
+                    <option value="low">До 10 000 ₽</option>
+                    <option value="mid">10 000 – 50 000 ₽</option>
+                    <option value="high">Более 50 000 ₽</option>
+                </select>
+            </div>
+<!-- Кнопка "Выбрать и забронировать" -->
+<button class="button" 
+        style="position: absolute; 
+               top: 150px; 
+               left: 430px; 
+               width: 400px; 
+               height: 80px; 
+               font-size: 20px;"
+        onclick="showTourList()">
+    Выбрать и забронировать
+</button>
+
+<!-- Кнопка "Оставить заявку на тур" -->
+<button class="button" 
+        style="position: absolute; 
+               top: 250px; 
+               left: 430px; 
+               width: 400px; 
+               height: 80px; 
+               font-size: 20px;"
+        onclick="showApplicationForm()">
+    Оставить заявку на тур
+</button>
+</div>
+</div>
+
+        <!-- Список предложений туров (скрыт по умолчанию) -->
+        <div id="tourList" style="position: absolute; top: 350px; left: 200px; width: 1600px; display: none; flex-wrap: wrap; gap: 20px;">
+            <!-- Пример карточки тура -->
+            <div style="background-color: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 12px; width: 450px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);">
+                <h3 style="color: #00f2ff;">Тур по Москве</h3>
+                <p style="color: #ccc;">Изучите исторические места столицы за 5 дней</p>
+                <p style="color: white;"><strong>Стоимость:</strong> 25 000 ₽</p>
+                <button class="button" style="width: 30%; margin-top: 10px;" onclick="bookTour('Тур по Москве')">
+                    Забронировать
+                </button>
+            </div>
+
+            <div style="background-color: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 12px; width: 450px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);">
+                <h3 style="color: #00f2ff;">Путешествие в Сибирь</h3>
+                <p style="color: #ccc;">Приключение в дикой природе и национальные традиции</p>
+                <p style="color: white;"><strong>Стоимость:</strong> 60 000 ₽</p>
+                <button class="button" style="width: 30%; margin-top: 10px;" onclick="bookTour('Путешествие в Сибирь')">
+                    Забронировать
+                </button>
+            </div>
+
+            <div style="background-color: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 12px; width: 450px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);">
+                <h3 style="color: #00f2ff;">Экскурсия по Уралу</h3>
+                <p style="color: #ccc;">Знакомство с культурой и природой Урала</p>
+                <p style="color: white;"><strong>Стоимость:</strong> 15 000 ₽</p>
+                <button class="button" style="width: 30%; margin-top: 10px;" onclick="bookTour('Экскурсия по Уралу')">
+                    Забронировать
+                </button>
+            </div>
+
+            <div style="background-color: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 12px; width: 450px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);">
+                <h3 style="color: #00f2ff;">Экскурсия по Якутии</h3>
+                <p style="color: #ccc;">Знакомство с культурой и природой Якутии</p>
+                <p style="color: white;"><strong>Стоимость:</strong> 35 000 ₽</p>
+                <button class="button" style="width: 30%; margin-top: 10px;" onclick="bookTour('Экскурсия по Уралу')">
+                    Забронировать
+                </button>
+            </div>
+        </div>
+
+        <!-- Форма заявки на тур (скрыта по умолчанию) -->
+        <div id="applicationForm" style="position: absolute; top: 350px; left: 50%; transform: translateX(-50%); width: 600px; background-color: rgba(0, 0, 0, 0.7); padding: 30px; border-radius: 12px; display: none;">
+            <h3 style="color: #00f2ff; text-align: center;">Оставить заявку на тур</h3>
+            <input type="text" id="appName" class="login-input" placeholder="Ваше имя" />
+            <input type="email" id="appEmail" class="login-input" placeholder="Email" />
+            <input type="tel" id="appPhone" class="login-input" placeholder="Телефон" />
+            <textarea id="appComment" rows="4" class="login-input" placeholder="Комментарий"></textarea>
+            <button class="button" 
+        style="position: absolute; 
+               top: 500px; 
+               left: 0px; 
+               width: 100%; 
+               margin-top: 20px;" 
+        onclick="submitApplication()">
+    Отправить заявку
+</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Показать список туров
+function showTourList() {
+    const tourList = document.getElementById('tourList');
+    const applicationForm = document.getElementById('applicationForm');
+
+    if (tourList) tourList.style.display = 'flex';
+    if (applicationForm) applicationForm.style.display = 'none';
+}
+
+function showApplicationForm() {
+    const tourList = document.getElementById('tourList');
+    const applicationForm = document.getElementById('applicationForm');
+
+    if (tourList) tourList.style.display = 'none';
+    if (applicationForm) applicationForm.style.display = 'block';
+}
+
+    // Отправить заявку
+    function submitApplication() {
+        const name = document.getElementById('appName').value.trim();
+        const email = document.getElementById('appEmail').value.trim();
+        const phone = document.getElementById('appPhone').value.trim();
+        const comment = document.getElementById('appComment').value.trim();
+
+        if (!name || !email || !phone) {
+            alert("Пожалуйста, заполните обязательные поля: имя, email и телефон");
+            return;
+        }
+
+        alert("Заявка успешно отправлена!");
+        console.log({ name, email, phone, comment }); // Здесь можно заменить на POST-запрос
+    }
+
+
+    // Забронировать тур
+    function bookTour(tourName) {
+        alert(`Вы успешно забронировали тур "${tourName}"`);
+    }
+
+
+// Закрытие модальных окон по Esc
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' || event.key === 'Esc' || event.keyCode === 27) {
+        const form = document.getElementById('applicationForm');
+        const tours = document.getElementById('tourList');
+
+        if (form && form.style.display === 'block') {
+            form.style.display = 'none';
+        }
+
+        if (tours && tours.style.display === 'flex') {
+            tours.style.display = 'none';
+        }
+    }
+});
+
+
+</script>
+
+    <!-- === JavaScript === -->
+    <script>
+
+
+function showApplicationForm() {
+    document.getElementById('tourList').style.display = 'none';
+    document.getElementById('applicationForm').style.display = 'block';
+}
+        function showScreen(screenNumber) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            const target = document.getElementById('screen' + screenNumber);
+            if (target) {
+                target.classList.add('active');
+            }
+        }
+
+        let currentSubmenu = null;
+
+        function showSubMenu(submenuId) {
+            const newMenu = document.getElementById(submenuId);
+            // Скрываем предыдущее меню
+            if (currentSubmenu) {
+                const oldMenu = document.getElementById(currentSubmenu);
+                if (oldMenu) oldMenu.style.display = 'none';
+            }
+            // Показываем новое меню
+            if (newMenu) {
+                newMenu.style.display = 'flex'; // <-- ВАЖНОЕ изменение
+                currentSubmenu = submenuId;
+            }
+        }
+
+/* вход / регистрация */
+
+        function sendCode() {
+            const phone = document.getElementById('phone').value;
+            if (phone.length !== 11 || !/^\d+$/.test(phone)) {
+                alert("Введите корректный номер телефона (11 цифр)");
+                return;
+            }
+            // Имитация отправки кода
+            alert("Код отправлен на телефон: " + phone);
+            // Разрешить ввод кода
+            document.getElementById('code').disabled = false;
+            document.getElementById('code').focus();
+        }
+
+        function checkCodeInput() {
+            const code = document.getElementById('code').value;
+            const loginBtn = document.getElementById('loginButton');
+            // Показать кнопку "Войти", если введено 4 цифры
+            if (code.length === 4 && /^\d+$/.test(code)) {
+                loginBtn.style.display = 'block';
+            } else {
+                loginBtn.style.display = 'none';
+            }
+        }
+
+        function loginUser() {
+            alert("Вы успешно вошли!");
+            showScreen(2); // Переход в Личный кабинет
+        }
+
+        function showRegistration() {
+            alert("Переход на регистрацию");
+            // Здесь можно открыть модальное окно или перейти на другой экран
+        }
+
+        // Инициализация карты
+        const map = L.map('map').setView([60, 100], 3); // Россия
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',  {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        fetch('russia-regions.geojson')
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: () => ({ color: "#00f2ff", weight: 2, fillOpacity: 0.1 }),
+                    onEachFeature: (feature, layer) => {
+                        layer.on('click', () => alert("Вы выбрали: " + feature.properties.name));
+                    }
+                }).addTo(map);
+            });
+
+        // Обработка клика по лицу
+        function handleFaceClick() {
+            alert('Добро пожаловать!');
+        }
+
+        document.getElementById('face').style.animationPlayState = 'paused'; // остановить
+        document.getElementById('face').style.animationPlayState = 'running'; // запустить
+
+        // Клик по аватарам
+        function showHeroInfo(heroName) {
+            alert("Вы нажали на " + heroName);
+        }
+
+        document.querySelectorAll('.avatar').forEach((avatar, index) => {
+            avatar.addEventListener('click', () => {
+                showHeroInfo(`Герой ${index + 1}`);
+            });
+        });
+
+function changeAvatar() {
+    alert("Переход к редактированию аватара");
+    // Здесь можно открыть модальное окно или перенаправить на страницу ReadyPlayer.Me
+}
+
+function openMarketplace() {
+    alert("Переход в NFT-маркетплейс");
+    showScreen(5); // Предположим, что у тебя есть экран с ID=5
+}
+
+function navigateTo(section) {
+    alert("Переход в раздел: " + section);
+    // Можно реализовать переход по внутренним разделам или показать модалку
+}
+
+function redeemOffer(title, karmaCost) {
+    const userKarma = 250; // Предположим, у пользователя есть 250 Karma
+    if (userKarma >= karmaCost) {
+        alert(`Вы получили: ${title} за ${karmaCost} Karma`);
+        // Здесь можно реализовать логику списания Karma и сохранения статуса
+    } else {
+        alert(`Недостаточно Karma для получения "${title}". Нужно: ${karmaCost}`);
+    }
+}
+
+// Показать экран регистрации
+function showRegistration() {
+    hideAllScreens();
+    document.getElementById('screen5').classList.add('active');
+}
+
+// Показать экран входа
+function showLogin() {
+    hideAllScreens();
+    document.getElementById('screen3').classList.add('active');
+}
+
+// Функция скрытия всех экранов
+function hideAllScreens() {
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(screen => screen.classList.remove('active'));
+}
+
+// Обработка регистрации
+function registerUser() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const agree = document.getElementById('agreeTerms').checked;
+
+    if (!name || !email || !phone || !password || !confirmPassword) {
+        alert("Пожалуйста, заполните все поля");
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert("Пароли не совпадают");
+        return;
+    }
+
+    if (!agree) {
+        alert("Вы должны принять пользовательское соглашение");
+        return;
+    }
+
+    // Сохраняем данные пользователя
+    localStorage.setItem('user', JSON.stringify({ name, email, phone }));
+
+    alert("Вы успешно зарегистрированы!");
+
+    // Переход в личный кабинет
+    setTimeout(() => {
+        hideAllScreens();
+        document.getElementById('screen2').classList.add('active');
+    }, 1000);
+}
+    
+
+    </script>
+
+    <!-- Leaflet -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script> 
+</body>
+</html>
